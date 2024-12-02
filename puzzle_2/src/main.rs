@@ -38,9 +38,13 @@ fn main() -> io::Result<()> {
     // TODO: calculate the frequency of each entry in list 1 in list 2. Get the scores and times
     // out entry from list 1 by the frequency from list 2
 
-    let list_1_set: BTreeSet<_> = list_1.clone().into_iter().collect();
+    let mut list_1_set: BTreeSet<_> = list_1.clone().into_iter().collect();
 
     // make a set for each entry make a struct.
+    for number in &list_1 {
+        list_1_set.insert(number.clone()); // insert into set
+    }
+
     // go through each struct and calculate the number of occurances of each entry in list_2
     // loop over the structs again and calculate the similarity score
 

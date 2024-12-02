@@ -2,11 +2,6 @@ use std::collections::BTreeSet;
 use std::fs::File;
 use std::io::{self, BufRead};
 
-struct Location {
-    id: i32,
-    frequency: i32,
-}
-
 fn main() -> io::Result<()> {
     // Open the file
     let file = File::open("input.txt")?;
@@ -45,22 +40,24 @@ fn main() -> io::Result<()> {
         list_1_set.insert(number.clone()); // insert into set
     }
 
+    let mut similarity_score = 0;
+
+    for entry in list_1_set {
+        // loop over each set entry
+        // loop over each number in the list 2 and count the frequency
+        let mut count_of_occurance = 0;
+        for number in &list_2 {
+            if entry == *number {
+                count_of_occurance += 1;
+            }
+        }
+        similarity_score += count_of_occurance * entry;
+    }
     // go through each struct and calculate the number of occurances of each entry in list_2
     // loop over the structs again and calculate the similarity score
-
-    // get the distances between the numbers
-    let mut distances = Vec::new();
-    for i in 0..list_1.len() {
-        distances.push((list_1[i] - list_2[i]).abs())
-    }
-
-    let mut sum = 0;
-    for number in distances {
-        sum += number;
-    }
-    println!("sum is: {}", sum);
-    println!("List 1: {:?}", list_1.len());
-    println!("List 2: {:?}", list_2.len());
+    println!("sum is: {}", similarity_score);
+    //println!("List 1: {:?}", list_1.len());
+    //println!("List 2: {:?}", list_2.len());
 
     Ok(())
 }

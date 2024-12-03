@@ -6,15 +6,17 @@ fn check_report(numbers: Vec<i32>) -> i32 {
     // all values are increasing or decreasing
     // all values differences are between 1 and 3
     let mut previous_gradient = numbers[0] - numbers[1];
-    let mut count = 0;
-    for i in 1..numbers.len() - 1 {
+    for i in 0..numbers.len() - 1 {
         let change = numbers[i] - numbers[i + 1];
+        println!("change = {}", change);
+        println!("numbers: {:?}", numbers);
         // still same gradient check
-        if change * previous_gradient == -1 {
+        println!("grad check:: {}", change * previous_gradient);
+        if change * previous_gradient < 0 {
             // different gradient
             return 0;
         }
-        if change.abs() > 3 || change.abs() < 1 {
+        if change.abs() > 3 || change.abs() == 0 {
             return 0;
         }
         previous_gradient = change;
@@ -33,8 +35,15 @@ fn main() -> io::Result<()> {
             .split_whitespace()
             .map(|line| line.parse().expect("parse error"))
             .collect();
+        println!("line converted to numbers: {:?}", numbers);
         sum += check_report(numbers);
     }
+    let mut line = "1 1 3 2 7 9".to_string();
+    //    let numbers: Vec<i32> = line
+    //        .split_whitespace()
+    //        .map(|line| line.parse().expect("parse error"))
+    //        .collect();
+    //    sum = check_report(numbers);
     println!("the sum is: {}", sum);
 
     Ok(())

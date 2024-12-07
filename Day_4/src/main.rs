@@ -1,3 +1,4 @@
+<<<<<<< HEAD
  n check_square(square: Vec<[&str; 4]>) {
     // checks the array of strings
     let mut x = 0; // x-coordinate
@@ -46,6 +47,8 @@ fn DPS(data: Vec<Vec<&str>>, word: Vec<&str>) {
     }
 }
 
+=======
+>>>>>>> 8684408 (arch update with notes)
 fn main() {
     println!("Hello, world!");
 }

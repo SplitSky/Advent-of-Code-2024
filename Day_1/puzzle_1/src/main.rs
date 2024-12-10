@@ -17,7 +17,6 @@ fn main() -> io::Result<()> {
     // Process each line
     for line in reader.lines() {
         let line = line?;
-        // if let Some((left, right)) = line.split_once('') {
         let mut parts = line.split_whitespace();
         if let (Some(left), Some(right)) = (parts.next(), parts.next()) {
             if let (Ok(left_num), Ok(right_num)) = (left.parse::<i32>(), right.parse::<i32>()) {

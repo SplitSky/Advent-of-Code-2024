@@ -38,6 +38,11 @@ impl Graph {
         }
         return true;
     }
+
+    fn fix_order(&self, update: &Vec<i32>) -> Vec<i32> {
+        // iterate over the updates until rule is violated
+        // swap the current tile with the
+    }
 }
 
 fn extract_middle(update: &Vec<i32>) -> i32 {
@@ -87,13 +92,22 @@ fn main() -> io::Result<()> {
         updates.push(parts);
     }
     let mut total = 0;
+    let mut wrong_list: Vec<Vec<i32>> = Vec::new();
     for update in updates {
         // check if path is okay
         if graph.is_order_valid(&update) == true {
             total += extract_middle(&update);
+        } else {
+            wrong_list.push(update);
         }
     }
     println!("total {}", total);
+
+    // fix the incorrect ones and add them up
+    for update in wrong_list {
+        // fix update
+        // get middle
+    }
 
     Ok(())
 }

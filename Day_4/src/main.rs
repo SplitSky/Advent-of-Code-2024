@@ -55,6 +55,63 @@ fn dps(data: Vec<Vec<String>>, word: Vec<&str>) {
     println!("found it {} times", word_counter);
 }
 
+fn part2_cross_search(data: Vec<Vec<String>>) {
+    // search for the pattern X of the word MAS
+    // go through each tile and check if the values are correct
+    let mut cross_counter = 0;
+    // four cross arrangements
+    // M . S
+    // . A .
+    // M . S
+    //
+    // M . M
+    // . A .
+    // S . S
+    //
+    // S . M
+    // . A .
+    // S . M
+    //
+    // S . S
+    // . A .
+    // M . M
+
+    for x in 0..data.len() {
+        for y in 0..data[x].len() {
+            // check cross can be fully in the boundary
+            if x + 2 > data[x].len() || y - 2 > data.len() {
+                break;
+            }
+            // cross checking logic
+            // cross one
+            if data[x + 1][y - 1] == "A" {
+                if data[x][y] == "M"
+                    && data[x + 2][y] == "S"
+                    && data[x][y - 2] == "M"
+                    && data[x + 2][y - 2] == "S"
+                {
+                    cross_counter += 1;
+                } else if data[x][y] == "M" && data[x + 2][y] == "M" && data[x][y - 2] == "S" {
+                    cross_counter += 1;
+                } else if data[x][y] == "S"
+                    && data[x + 2][y] == "M"
+                    && data[x][y - 2] == "S"
+                    && data[x + 2][y - 2] == "M"
+                {
+                    cross_counter += 1;
+                } else if data[x][y] == "S"
+                    && data[x + 2][y] == "S"
+                    && data[x][y - 2] == "M"
+                    && data[x + 2][y - 2] == "M"
+                {
+                    cross_counter += 1;
+                }
+            }
+        }
+    }
+    println!("found it {} times", cross_counter);
+}
+
 fn split_into_chars(input: &str) -> Vec<String> {
     input
         .char_indices()
@@ -72,7 +129,8 @@ fn main() -> io::Result<()> {
         data_in.push(parts);
     }
     let word = vec!["X", "M", "A", "S"]; // Word to search
-    dps(data_in, word);
+    dps(data_in.clone(), word);
+    part2_cross_search(data_in);
 
     Ok(())
 }

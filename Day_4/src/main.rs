@@ -56,60 +56,52 @@ fn dps(data: Vec<Vec<String>>, word: Vec<&str>) {
 }
 
 fn part2_cross_search(data: Vec<Vec<String>>) {
-    // search for the pattern X of the word MAS
-    // go through each tile and check if the values are correct
     let mut cross_counter = 0;
-    // four cross arrangements
-    // M . S
-    // . A .
-    // M . S
-    //
-    // M . M
-    // . A .
-    // S . S
-    //
-    // S . M
-    // . A .
-    // S . M
-    //
-    // S . S
-    // . A .
-    // M . M
 
     for x in 0..data.len() {
         for y in 0..data[x].len() {
-            // check cross can be fully in the boundary
-            if x + 2 > data[x].len() || y - 2 > data.len() {
-                break;
+            // Check cross boundaries
+            if x + 2 >= data.len() || y < 2 {
+                continue;
             }
-            // cross checking logic
-            // cross one
-            if data[x + 1][y - 1] == "A" {
-                if data[x][y] == "M"
-                    && data[x + 2][y] == "S"
-                    && data[x][y - 2] == "M"
-                    && data[x + 2][y - 2] == "S"
-                {
-                    cross_counter += 1;
-                } else if data[x][y] == "M" && data[x + 2][y] == "M" && data[x][y - 2] == "S" {
-                    cross_counter += 1;
-                } else if data[x][y] == "S"
-                    && data[x + 2][y] == "M"
-                    && data[x][y - 2] == "S"
-                    && data[x + 2][y - 2] == "M"
-                {
-                    cross_counter += 1;
-                } else if data[x][y] == "S"
-                    && data[x + 2][y] == "S"
-                    && data[x][y - 2] == "M"
-                    && data[x + 2][y - 2] == "M"
-                {
-                    cross_counter += 1;
-                }
+
+            // Check for 4 cross patterns
+            if data[x][y] == "M"
+                && data[x + 2][y] == "S"
+                && data[x][y - 2] == "M"
+                && data[x + 2][y - 2] == "S"
+                && data[x + 1][y - 1] == "A"
+            {
+                cross_counter += 1;
+            }
+            if data[x][y] == "M"
+                && data[x + 2][y] == "M"
+                && data[x][y - 2] == "S"
+                && data[x + 2][y - 2] == "S"
+                && data[x + 1][y - 1] == "A"
+            {
+                cross_counter += 1;
+            }
+            if data[x][y] == "S"
+                && data[x + 2][y] == "M"
+                && data[x][y - 2] == "S"
+                && data[x + 2][y - 2] == "M"
+                && data[x + 1][y - 1] == "A"
+            {
+                cross_counter += 1;
+            }
+            if data[x][y] == "S"
+                && data[x + 2][y] == "S"
+                && data[x][y - 2] == "M"
+                && data[x + 2][y - 2] == "M"
+                && data[x + 1][y - 1] == "A"
+            {
+                cross_counter += 1;
             }
         }
     }
-    println!("found it {} times", cross_counter);
+
+    println!("Found it {} times", cross_counter);
 }
 
 fn split_into_chars(input: &str) -> Vec<String> {

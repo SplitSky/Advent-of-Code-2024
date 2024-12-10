@@ -1,4 +1,4 @@
-### The Ceres Search
+# The Ceres Search
 
 The possible arrangements in the 4 by 4 boxes are
 

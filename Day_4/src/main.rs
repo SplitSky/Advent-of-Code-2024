@@ -1,51 +1,78 @@
-fn dps(data: Vec<Vec<&str>>, word: Vec<&str>) {
-    // loop over all tiles
+use std::fs::File;
+use std::io::{self, BufRead};
+
+fn dps(data: Vec<Vec<String>>, word: Vec<&str>) {
     let mut word_counter = 0;
+
+    // All 8 possible directions
+    let directions = [
+        (0, 1),   // right
+        (0, -1),  // left
+        (1, 0),   // down
+        (-1, 0),  // up
+        (1, 1),   // down-right
+        (1, -1),  // down-left
+        (-1, 1),  // up-right
+        (-1, -1), // up-left
+    ];
+
     for x in 0..data.len() {
         for y in 0..data[x].len() {
-            // go over all directions
-            for i in 0..2 {
-                let mut curr_x = x;
-                let mut curr_y = y;
-                // declare current position variables
-                for j in 0..2 {
-                    // loop over directions
-                    // check the letter agrees
-                    let mut stop = false;
-                    let mut letter_counter = 0;
-                    while stop != true {
-                        // logic for comparisons
-                        // check the letter matches
-                        if word[letter_counter] != data[x][y] {
-                            stop = true;
-                        } else {
-                            letter_counter += 1; // move to the next letter in the word
-                                                 // move the direction
-                                                 // check if it's the end of the word
-                            if letter_counter == word.len() {
-                                // success word has been found
-                                word_counter += 1;
-                            }
-                            // make a move!
-                            curr_x += i-1;
-                            curr_y += j-1;
-                            // check out of bounds
-                            if curr_x < 0 || curr_x > data[x].len() {
-                                // stop
-                                stop = true;
-                            }
-                            if curr_y < 0 || curr_y > data.len() {
-                                stop = true;
-                            }
-                            // else keep going
-                        }
+            for &(dx, dy) in &directions {
+                let mut curr_x = x as isize;
+                let mut curr_y = y as isize;
+                let mut letter_counter = 0;
+
+                while letter_counter < word.len() {
+                    // Check out of bounds
+                    if curr_x < 0
+                        || curr_x >= data.len() as isize
+                        || curr_y < 0
+                        || curr_y >= data[curr_x as usize].len() as isize
+                    {
+                        break;
                     }
+
+                    // Check if the current letter matches
+                    if word[letter_counter] != data[curr_x as usize][curr_y as usize] {
+                        break;
+                    }
+
+                    // Move to the next letter and position
+                    letter_counter += 1;
+                    curr_x += dx;
+                    curr_y += dy;
+                }
+
+                // If the entire word was matched
+                if letter_counter == word.len() {
+                    word_counter += 1;
                 }
             }
         }
     }
+
+    println!("found it {} times", word_counter);
 }
 
-fn main() {
-    let data_in = [[]]
+fn split_into_chars(input: &str) -> Vec<String> {
+    input
+        .char_indices()
+        .map(|(i, _)| input[i..i + input[i..].chars().next().unwrap().len_utf8()].to_string())
+        .collect()
+}
+
+fn main() -> io::Result<()> {
+    let file = File::open("input.txt")?;
+    let reader = io::BufReader::new(file);
+    let mut data_in: Vec<Vec<String>> = Vec::new();
+    for line in reader.lines() {
+        let line = line?;
+        let parts: Vec<String> = split_into_chars(&line);
+        data_in.push(parts);
+    }
+    let word = vec!["X", "M", "A", "S"]; // Word to search
+    dps(data_in, word);
+
+    Ok(())
 }

@@ -39,9 +39,84 @@ impl Graph {
         return true;
     }
 
-    fn fix_order(&self, update: &Vec<i32>) -> Vec<i32> {
-        // iterate over the updates until rule is violated
-        // swap the current tile with the
+    fn fix_order(&self, update: &mut Vec<i32>) -> bool {
+        // Create a position lookup table for the elements in `update`
+        let mut position: HashMap<i32, usize> = update
+            .iter()
+            .enumerate()
+            .map(|(index, &page)| (page, index))
+            .collect();
+
+        // Check for rule violations and swap elements
+        for (&from, targets) in &self.adj_list {
+            if let Some(&from_pos) = position.get(&from) {
+                for &to in targets {
+                    if let Some(&to_pos) = position.get(&to) {
+                        if from_pos >= to_pos {
+                            // Swap the elements in the update vector
+                            update.swap(from_pos, to_pos);
+                            // Update the lookup table since indices have changed
+                            position.insert(update[from_pos], from_pos);
+                            position.insert(update[to_pos], to_pos);
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    fn fix_order_2(&self, update: &mut Vec<i32>) -> bool {
+        use std::collections::{HashMap, VecDeque};
+
+        let mut in_degree: HashMap<i32, usize> = HashMap::new();
+        for &mut item in &mut *update {
+            in_degree.entry(item).or_insert(0);
+        }
+        for (&from, targets) in &self.adj_list {
+            if in_degree.contains_key(&from) {
+                for &to in targets {
+                    if in_degree.contains_key(&to) {
+                        *in_degree.entry(to).or_insert(0) += 1;
+                    }
+                }
+            }
+        }
+
+        let mut queue: VecDeque<i32> = VecDeque::new();
+        for (&node, &degree) in &in_degree {
+            if degree == 0 {
+                queue.push_back(node);
+            }
+        }
+
+        let mut sorted_order: Vec<i32> = Vec::new();
+        while let Some(node) = queue.pop_front() {
+            sorted_order.push(node);
+            if let Some(targets) = self.adj_list.get(&node) {
+                for &neighbor in targets {
+                    if let Some(in_deg) = in_degree.get_mut(&neighbor) {
+                        *in_deg -= 1;
+                        if *in_deg == 0 {
+                            queue.push_back(neighbor);
+                        }
+                    }
+                }
+            }
+        }
+
+        if sorted_order.len() != in_degree.len() {
+            return false;
+        }
+
+        let position_map: HashMap<i32, usize> = sorted_order
+            .iter()
+            .enumerate()
+            .map(|(i, &value)| (value, i))
+            .collect();
+        update.sort_by_key(|value| position_map.get(value).cloned().unwrap_or(usize::MAX));
+
+        true
     }
 }
 
@@ -103,11 +178,18 @@ fn main() -> io::Result<()> {
     }
     println!("total {}", total);
 
+    total = 0;
     // fix the incorrect ones and add them up
-    for update in wrong_list {
-        // fix update
-        // get middle
+    for update in wrong_list.iter_mut() {
+        // fix the order
+        graph.fix_order_2(update);
     }
-
+    // count of the correct instruction middle values
+    for update in wrong_list {
+        if graph.is_order_valid(&update) == true {
+            total += extract_middle(&update);
+        }
+    }
+    println!("total {}", total);
     Ok(())
 }

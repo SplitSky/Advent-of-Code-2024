@@ -20,8 +20,8 @@ impl Guard {
         // matrix multiplication
         //[0, -1] [x]= [-y]
         //[1,  0] [y]= [ x]
-        self.direction.0 = self.direction.1;
-        self.direction.1 = -self.direction.0;
+        let (dx, dy) = self.direction;
+        self.direction = (dy, -dx);
     }
     fn step(&mut self) {
         // take step forward
@@ -31,6 +31,10 @@ impl Guard {
     fn print_things(&mut self) {
         println!("position is: {},{}", self.x_pos, self.y_pos);
         println!("direction is: {}, {}", self.direction.0, self.direction.1);
+    }
+    fn step_back(&mut self) {
+        self.x_pos -= self.direction.0;
+        self.y_pos -= self.direction.1;
     }
 }
 
@@ -68,10 +72,10 @@ fn main() -> io::Result<()> {
     let mut guard = guard.expect("Guard not found on the board");
     println!("board {:?}", board);
     let mut colored_fields = 0;
-    while guard.y_pos + guard.direction.1 >= 0
-        && guard.y_pos + guard.direction.1 < board.len() as i32
-        && guard.x_pos + guard.direction.0 >= 0
-        && guard.x_pos + guard.direction.1 < board[guard.y_pos as usize].len() as i32
+    while guard.y_pos >= 0
+        && guard.y_pos < board.len() as i32
+        && guard.x_pos >= 0
+        && guard.x_pos < board[guard.y_pos as usize].len() as i32
     {
         println!("guard x struct {}", guard.x_pos);
         println!("guard y struct {}", guard.y_pos);
@@ -94,6 +98,7 @@ fn main() -> io::Result<()> {
             }
             '#' => {
                 // obstacle
+                guard.step_back();
                 guard.rotate();
                 guard.print_things();
             }

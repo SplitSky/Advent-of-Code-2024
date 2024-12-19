@@ -123,5 +123,6 @@ fn main() -> io::Result<()> {
 
     println!("Total colored fields: {}", colored_fields);
 
+    println!("Estimate {}", colored_fields / 3);
     Ok(())
 }

@@ -1,3 +1,4 @@
+use std::collections::VecDeque;
 use std::fs::File;
 use std::io::Write;
 use std::io::{self, BufRead};
@@ -6,6 +7,7 @@ struct Guard {
     x_pos: i32,
     y_pos: i32,
     direction: (i32, i32), // (dx, dy)
+    turn_position: VecDeque<(i32, i32)>,
 }
 
 impl Guard {
@@ -14,12 +16,17 @@ impl Guard {
             x_pos,
             y_pos,
             direction,
+            turn_position: VecDeque::new(),
         }
     }
 
     fn rotate(&mut self) {
         let (dx, dy) = self.direction;
         self.direction = (-dy, dx);
+        self.turn_position.push_back((self.x_pos, self.y_pos));
+        if self.turn_position.len() > 3 {
+            self.turn_position.pop_front();
+        }
     }
 
     fn step(&mut self) {
@@ -32,6 +39,22 @@ impl Guard {
             "Position: ({}, {}), Direction: ({}, {})",
             self.x_pos, self.y_pos, self.direction.0, self.direction.1
         );
+    }
+    fn calculate_fourth_point(&self) -> Option<(i32, i32)> {
+        if self.turn_position.len() == 3 {
+            let &(x1, y1) = &self.turn_position[0];
+            let &(x2, y2) = &self.turn_position[1];
+            let &(x3, y3) = &self.turn_position[2];
+
+            let x4 = x1 + x3 - x2;
+            let y4 = y1 + y3 - y2;
+            Some((x4, y4))
+        } else {
+            None
+        }
+    }
+    fn check_position(&self, pos_to_check: (i32, i32)) -> bool {
+        return pos_to_check.0 == self.x_pos && pos_to_check.1 == self.y_pos;
     }
 }
 
@@ -74,12 +97,15 @@ fn main() -> io::Result<()> {
 
     let mut guard = guard.unwrap();
     let mut colored_fields = 0;
+    let mut obstacle_counter = 0;
+    let mut fourth_point: Option<(i32, i32)>;
 
     while guard.y_pos >= 0
         && guard.y_pos < board.len() as i32
         && guard.x_pos >= 0
         && guard.x_pos < board[guard.y_pos as usize].len() as i32
     {
+        fourth_point = guard.calculate_fourth_point();
         guard.print_things();
         write_board_to_file(&board, "debut_board.txt");
 
@@ -104,12 +130,18 @@ fn main() -> io::Result<()> {
 
         let ahead = board[next_y as usize][next_x as usize];
 
+        // if the point ahead would result in a cycle then add 1 to the counter
+        if guard.check_position(fourth_point.expect("wrong position")) == true {
+            obstacle_counter += 1;
+        }
+
         match ahead {
             '.' => {
                 guard.step();
             }
             '#' => {
                 guard.rotate();
+                // appends the fourth point in the function
             }
             _ => {
                 guard.step();
@@ -123,6 +155,7 @@ fn main() -> io::Result<()> {
 
     println!("Total colored fields: {}", colored_fields);
 
-    println!("Estimate {}", colored_fields / 3);
+    // do the simulation again but every time
+
     Ok(())
 }

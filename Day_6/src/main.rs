@@ -54,6 +54,7 @@ impl Guard {
         }
     }
     fn check_position(&self, pos_to_check: (i32, i32)) -> bool {
+        // checks whether guard is on a given position
         return pos_to_check.0 == self.x_pos && pos_to_check.1 == self.y_pos;
     }
 }
@@ -105,9 +106,10 @@ fn main() -> io::Result<()> {
         && guard.x_pos >= 0
         && guard.x_pos < board[guard.y_pos as usize].len() as i32
     {
+        // while simulation is happening check for the cycles
         fourth_point = guard.calculate_fourth_point();
         guard.print_things();
-        write_board_to_file(&board, "debut_board.txt");
+        let _ = write_board_to_file(&board, "debut_board.txt");
 
         let x = guard.x_pos as usize;
         let y = guard.y_pos as usize;
@@ -131,6 +133,7 @@ fn main() -> io::Result<()> {
         let ahead = board[next_y as usize][next_x as usize];
 
         // if the point ahead would result in a cycle then add 1 to the counter
+        // check if the list is 4 points long. If it is then start checking
         if guard.check_position(fourth_point.expect("wrong position")) == true {
             obstacle_counter += 1;
         }

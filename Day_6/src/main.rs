@@ -108,7 +108,7 @@ fn main() -> io::Result<()> {
     {
         // while simulation is happening check for the cycles
         fourth_point = guard.calculate_fourth_point();
-        guard.print_things();
+        // guard.print_things();
         let _ = write_board_to_file(&board, "debut_board.txt");
 
         let x = guard.x_pos as usize;
@@ -134,8 +134,10 @@ fn main() -> io::Result<()> {
 
         // if the point ahead would result in a cycle then add 1 to the counter
         // check if the list is 4 points long. If it is then start checking
-        if guard.check_position(fourth_point.expect("wrong position")) == true {
-            obstacle_counter += 1;
+        if fourth_point != None {
+            if guard.check_position(fourth_point.expect("wrong position")) == true {
+                obstacle_counter += 1;
+            }
         }
 
         match ahead {
@@ -158,7 +160,7 @@ fn main() -> io::Result<()> {
 
     println!("Total colored fields: {}", colored_fields);
 
-    // do the simulation again but every time
+    println!("Obstacle Count: {}", obstacle_counter);
 
     Ok(())
 }
